@@ -1,0 +1,132 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manage Products - FastPrint</title>
+    
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+    
+    <!-- Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Vue 3 & Axios -->
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    
+    <!-- Custom Style -->
+    <link rel="stylesheet" href="{% static 'products/style.css' %}">
+</head>
+<body>
+    <div id="app" v-cloak>
+        <!-- Background Elements -->
+        <div class="bg-shape shape-1"></div>
+        <div class="bg-shape shape-2"></div>
+
+        <div class="container">
+            <!-- Header -->
+            <header class="glass-header">
+                <h1>FastPrint Products</h1>
+                <div class="nav-buttons">
+                    <button 
+                        @click="switchMode('bisa_dijual')" 
+                        :class="['glass-btn', { active: currentMode === 'bisa_dijual' }]">
+                        <i class="fas fa-check-circle"></i> Bisa Dijual
+                    </button>
+                    <button 
+                        @click="switchMode('all')" 
+                        :class="['glass-btn', { active: currentMode === 'all' }]">
+                        <i class="fas fa-layer-group"></i> Semua Data
+                    </button>
+                    <button @click="openModal()" class="glass-btn btn-primary">
+                        <i class="fas fa-plus"></i> Tambah
+                    </button>
+                </div>
+            </header>
+
+            <!-- Product List -->
+            <div class="glass-panel main-content">
+                <div v-if="loading" class="loading-state">
+                    <i class="fas fa-spinner fa-spin"></i> Memuat Data...
+                </div>
+                
+                <div v-else-if="products.length === 0" class="empty-state">
+                    <i class="fas fa-box-open"></i>
+                    <p>Tidak ada produk ditemukan.</p>
+                </div>
+
+                <div v-else class="product-grid">
+                    <div v-for="product in products" :key="product.id_produk" class="product-card">
+                        <h3>[[ product.nama_produk ]]</h3>
+                        <p class="price">Rp [[ formatPrice(product.harga) ]]</p>
+                        <p class="category">[[ product.kategori_nama ]]</p>
+                        
+                        <div class="card-badge-container">
+                             <div class="card-badge" :class="getStatusClass(product.status_nama)">
+                                [[ product.status_nama ]]
+                            </div>
+                        </div>
+
+                        <div class="card-actions">
+                            <button @click="editProduct(product)" class="action-btn edit" title="Edit">
+                                <i class="fas fa-pen"></i>
+                            </button>
+                            <button @click="confirmDelete(product)" class="action-btn delete" title="Hapus">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+        <!-- Modal Form -->
+        <div v-if="showModal" class="modal-overlay" @click.self="closeModal">
+            <div class="glass-panel modal-content">
+                <h2>[[ isEditing ? 'Edit Produk' : 'Tambah Produk' ]]</h2>
+                <form @submit.prevent="saveProduct">
+                    <div class="form-group">
+                        <label>Nama Produk</label>
+                        <input type="text" v-model="form.nama_produk" class="glass-input" placeholder="Masukkan nama produk" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Harga</label>
+                        <input type="number" v-model="form.harga" class="glass-input" placeholder="0" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Kategori</label>
+                        <select v-model="form.kategori_id" class="glass-input">
+                            <option v-for="cat in categories" :value="cat.id_kategori">
+                                [[ cat.nama_kategori ]]
+                            </option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Status</label>
+                        <select v-model="form.status_id" class="glass-input" :disabled="currentMode === 'bisa_dijual' && !isEditing">
+                            <option v-for="stat in statuses" :value="stat.id_status">
+                                [[ stat.nama_status ]]
+                            </option>
+                        </select>
+                    </div>
+                    
+                    <div class="modal-actions">
+                        <button type="button" @click="closeModal" class="glass-btn">Batal</button>
+                        <button type="submit" class="glass-btn btn-primary">Simpan</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+    </div>
+
+    <script src="{% static 'products/app.js' %}"></script>
+</body>
+</html>

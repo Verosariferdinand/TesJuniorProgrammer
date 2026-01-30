@@ -1,0 +1,37 @@
+{% extends 'products/base.html' %}
+
+{% block content %}
+<div class="card border-danger">
+    <div class="card-header bg-danger text-white">
+        <h3>Konfirmasi Hapus</h3>
+    </div>
+    <div class="card-body">
+        <p>Apakah Anda yakin ingin menghapus produk <strong>{{ product.nama_produk }}</strong>?</p>
+        <form method="post" id="deleteForm">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-danger" onclick="return confirm('Apakah anda yakin ingin menghapus data ini?');">Ya, Hapus</button>
+            <a href="{% url 'product_list' %}" class="btn btn-secondary">Batal</a>
+        </form>
+    </div>
+</div>
+
+<script>
+    // Requirement 5: Alert/confirm when delete is clicked.
+    // The button already has an onclick confirm, but we can also add it via event listener if preferred.
+    // The requirement says "ketika di klik hapus", which usually means the button that triggers the action.
+    // Since we are on a separate confirmation page (standard Django pattern), the "Ya, Hapus" button is the final "Delete" action.
+    // However, if the user meant the "Hapus" button on the list page, I can add it there too?
+    // Usually "alert/konfirmasi(confirm)" implies a JS popup.
+    // I put it on the final submit button here, and I will strictly add a JS confirm on the list page button too for quick deletion if I were using a form there.
+    // But since the list page links to this page, the "Hapus" button on list page just navigates.
+    // Maybe I should make the list page button also confirm?
+    // "Untuk fitur hapus beri alert/konfirmasi(confirm) ketika di klik hapus". 
+    // If I navigate to a confirm page, that IS a confirmation. But "alert/confirm" usually refers to window.confirm().
+    // I will add window.confirm() to the list page button as well? No, that would be double confirmation.
+    // The prompt implies a JS confirm.
+    // I will add a JS confirm on the delete button in the list page? 
+    // If I do that, I should probably submit a form directly.
+    // But standard Django is View -> Confirm Page.
+    // I'll stick to the view -> confirm page, and put the JS confirm on the final button.
+</script>
+{% endblock %}
